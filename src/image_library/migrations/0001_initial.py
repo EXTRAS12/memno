@@ -9,11 +9,13 @@ import src.base.services
 class Migration(migrations.Migration):
     initial = True
 
-    dependencies = []
+    dependencies = [
+        ("user", "0001_initial"),
+    ]
 
     operations = [
         migrations.CreateModel(
-            name="AuthUser",
+            name="Image",
             fields=[
                 (
                     "id",
@@ -24,30 +26,42 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("email", models.EmailField(max_length=150, unique=True)),
-                ("join_date", models.DateField(auto_now_add=True)),
-                ("country", models.CharField(blank=True, max_length=30, null=True)),
-                ("city", models.CharField(blank=True, max_length=30, null=True)),
-                ("bio", models.TextField(blank=True, max_length=2000, null=True)),
-                ("nickname", models.CharField(blank=True, max_length=30, null=True)),
                 (
-                    "avatar",
+                    "description",
+                    models.TextField(max_length=1500, verbose_name="Описание"),
+                ),
+                (
+                    "image",
                     models.ImageField(
-                        blank=True,
-                        null=True,
-                        upload_to=src.base.services.get_path_upload_avatar,
+                        upload_to=src.base.services.get_path_upload_image,
                         validators=[
                             django.core.validators.FileExtensionValidator(
-                                allowed_extensions=["jpg"]
+                                allowed_extensions=["jpg", "png", "jpeg"]
                             ),
                             src.base.services.validate_size_image,
                         ],
                     ),
                 ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("likes_count", models.PositiveIntegerField(default=0)),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="images",
+                        to="user.authuser",
+                    ),
+                ),
+                (
+                    "user_of_likes",
+                    models.ManyToManyField(
+                        related_name="likes_of_image", to="user.authuser"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name="SocialLink",
+            name="FavouriteImage",
             fields=[
                 (
                     "id",
@@ -58,19 +72,37 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("link", models.URLField(max_length=100)),
+                ("title", models.CharField(max_length=100)),
+                (
+                    "cover",
+                    models.ImageField(
+                        upload_to=src.base.services.get_path_upload_cover_favourite_image,
+                        validators=[
+                            django.core.validators.FileExtensionValidator(
+                                allowed_extensions=["jpg", "png", "jpeg"]
+                            ),
+                            src.base.services.validate_size_image,
+                        ],
+                    ),
+                ),
+                (
+                    "images",
+                    models.ManyToManyField(
+                        related_name="image_favourites_lists", to="image_library.image"
+                    ),
+                ),
                 (
                     "user",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        related_name="social_links",
+                        related_name="favourites_lists",
                         to="user.authuser",
                     ),
                 ),
             ],
         ),
         migrations.CreateModel(
-            name="Follower",
+            name="Comment",
             fields=[
                 (
                     "id",
@@ -81,19 +113,21 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
+                ("text", models.TextField(max_length=1000)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
                 (
-                    "subscriber",
+                    "image",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        related_name="subscribers",
-                        to="user.authuser",
+                        related_name="image_comments",
+                        to="image_library.image",
                     ),
                 ),
                 (
                     "user",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        related_name="owner",
+                        related_name="comments",
                         to="user.authuser",
                     ),
                 ),
