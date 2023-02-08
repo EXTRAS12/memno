@@ -11,7 +11,7 @@ class ImageAdmin(admin.ModelAdmin):
         "user",
         "created_at",
     )
-    search_fields = ("user",)
+    search_fields = ("user__email", "user__nickname")
 
 
 @admin.register(models.Comment)
@@ -24,4 +24,4 @@ class CommentAdmin(admin.ModelAdmin):
 class FavouriteImageAdmin(admin.ModelAdmin):
     list_display = ("id", "user", "title")
     list_display_links = ("user",)
-    search_fields = ("user", "images__title")
+    search_fields = ("user__nickname", "images__title")

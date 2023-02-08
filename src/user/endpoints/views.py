@@ -9,7 +9,7 @@ class UserView(viewsets.ModelViewSet):
     """Просмотр и редактирование данных пользователя"""
 
     parser_classes = (parsers.MultiPartParser,)
-    serializer_class = serializer.UserSerializer
+    serializer_class = serializer.AuthUserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):

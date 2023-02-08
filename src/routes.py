@@ -24,6 +24,8 @@ urlpatterns = [
         schema_view.with_ui("redoc", cache_timeout=0),
         name="schema-redoc",
     ),
-    path("auth/", include("src.user.urls")),
+    path("", include("src.user.urls")),
     path("image/", include("src.image_library.urls")),
+    # path("auth/", include("djoser.urls")),
+    path("auth/", include("djoser.urls.jwt")),
 ]
